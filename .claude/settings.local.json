@@ -3,7 +3,12 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(find:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx prettier:*)",
+      "Bash(cp:*)",
+      "Bash(chmod:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

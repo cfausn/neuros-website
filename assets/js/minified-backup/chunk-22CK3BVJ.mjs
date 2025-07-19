@@ -1,0 +1,2 @@
+function e(t,a){return{description:"BetterMedical: Your Trusted Healthcare Framer Template. Elevate your healthcare projects with our versatile and user-friendly template. Craft stunning medical websites, apps, and interfaces with ease. BetterMedical: Where Design Meets Health.",robots:"max-image-preview:large",socialImage:"https://framerusercontent.com/assets/np40RoEgRBdRx2GsmyIGjydkkZM.png",title:"BetterMedical - Healthcare Framer Template"}}export{e as a};
+//# sourceMappingURL=chunk-22CK3BVJ.mjs.map
