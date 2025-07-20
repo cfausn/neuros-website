@@ -16,11 +16,16 @@
   
   // List of modules to load in order
   const modules = [
-    'navigation/navigation-config.js',
-    'navigation/navigation-renderer.js',
-    'components/blog-section-handler.js',
-    'components/patients-section-handler.js',
-    'index.js'
+    'framer-override-system-v2.js', // Load V2 override system first!
+    // Temporarily disable other modules to test override system
+    // 'navigation/navigation-config.js',
+    // 'navigation/navigation-renderer.js',
+    // 'components/blog-section-handler.js',
+    // 'components/patients-section-handler.js',
+    // 'components/footer-handler.js',
+    // 'components/faq-updater.js',
+    // 'components/faq-updater-v2.js',
+    // 'index.js'
   ];
   
   // Load a script dynamically

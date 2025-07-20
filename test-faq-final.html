@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FAQ Update Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .status { margin: 20px 0; padding: 10px; background: #f0f0f0; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>FAQ Update Test</h1>
+    
+    <button onclick="checkFAQ()">Check Current FAQ</button>
+    <button onclick="forceUpdate()">Force Update</button>
+    
+    <div class="status" id="status">Ready to test...</div>
+    
+    <script>
+        function checkFAQ() {
+            // Search for FAQ questions
+            const questions = [];
+            const walker = document.createTreeWalker(
+                document.body,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            let node;
+            while (node = walker.nextNode()) {
+                const text = node.textContent.trim();
+                if (text.includes('?') && text.length > 10) {
+                    questions.push({
+                        text: text,
+                        element: node.parentElement?.tagName,
+                        classes: node.parentElement?.className
+                    });
+                }
+            }
+            
+            document.getElementById('status').innerHTML = 
+                '<h3>Found Questions:</h3><pre>' + 
+                JSON.stringify(questions, null, 2) + 
+                '</pre>';
+        }
+        
+        function forceUpdate() {
+            const neurofeedbackFAQs = [
+              {
+                question: "How does neurofeedback help children with ASD?",
+                answer: "Neurofeedback helps children with ASD by training their brains to self-regulate."
+              },
+              {
+                question: "What age is appropriate for neurofeedback therapy?",
+                answer: "Neurofeedback is suitable for children as young as 5 years old."
+              },
+              {
+                question: "How many sessions does my child need?",
+                answer: "Most children benefit from 20-40 sessions."
+              }
+            ];
+            
+            // Direct text replacement
+            const walker = document.createTreeWalker(
+                document.body,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            let node;
+            let updated = 0;
+            
+            while (node = walker.nextNode()) {
+                const text = node.textContent.trim();
+                
+                if (text === "How to join the Primary Care program?") {
+                    node.textContent = neurofeedbackFAQs[0].question;
+                    updated++;
+                } else if (text === "How much does a consultation cost at Primary?") {
+                    node.textContent = neurofeedbackFAQs[1].question;
+                    updated++;
+                } else if (text === "How much do the annual preventive check-ups cost?") {
+                    node.textContent = neurofeedbackFAQs[2].question;
+                    updated++;
+                }
+            }
+            
+            document.getElementById('status').innerHTML = 
+                `<h3>Updated ${updated} questions</h3>`;
+                
+            // Check again after update
+            setTimeout(checkFAQ, 500);
+        }
+    </script>
+    
+    <hr>
+    
+    <h2>Test FAQ Section</h2>
+    <div class="framer-agkRe">
+        <h3>How to join the Primary Care program?</h3>
+        <p>This is the answer about joining.</p>
+    </div>
+    
+    <div class="framer-agkRe">
+        <h3>How much does a consultation cost at Primary?</h3>
+        <p>This is the answer about cost.</p>
+    </div>
+    
+    <div class="framer-agkRe">
+        <h3>How much do the annual preventive check-ups cost?</h3>
+        <p>This is the answer about check-ups.</p>
+    </div>
+</body>
+</html>

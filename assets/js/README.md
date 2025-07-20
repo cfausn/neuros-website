@@ -1,105 +1,93 @@
-# Neuros Website JavaScript Architecture
+# Neuros Website JavaScript Architecture v2.0
 
 ## Overview
 
-This directory contains the modularized JavaScript code for the Neuros website. The code has been restructured from minified Framer-generated files into maintainable, AI-friendly modules.
+This is a clean, modular JavaScript architecture that provides complete control over a Framer-exported website. Instead of fighting against Framer's rendering system, it intercepts and modifies behavior at the source level.
 
-## Directory Structure
+## Key Features
+
+- **Early Interception**: Loads before Framer to intercept core functions
+- **Event-Driven**: Uses Framer's lifecycle events for optimal timing
+- **Modular Design**: Small, focused modules under 15KB each
+- **Single Configuration**: All customizations in one config file
+- **AI-Friendly**: Designed for easy understanding and modification by AI agents
+
+## Architecture
 
 ```
 assets/js/
-├── src/                          # Source modules
-│   ├── navigation/              # Navigation-related modules
-│   │   ├── navigation-config.js # Navigation item configuration
-│   │   └── navigation-renderer.js # Navigation rendering and DOM manipulation
-│   ├── components/              # Component-specific handlers
-│   │   ├── blog-section-handler.js # Removes blog sections
-│   │   └── patients-section-handler.js # Removes patients sections
-│   └── index.js                 # Main entry point
-├── neuros-loader.js            # Module loader script
-└── minified_backup/            # Backup of original minified files
+├── neuros-init.js          # Early loader (loads before Framer)
+├── src/
+│   ├── config/
+│   │   └── site-config.js  # All site customizations
+│   ├── core/
+│   │   ├── framer-interceptor.js  # Intercepts Framer functions
+│   │   ├── module-overrides.js    # Module replacement system
+│   │   └── event-manager.js       # Event coordination
+│   └── modules/
+│       ├── navigation.js          # Navigation management
+│       ├── content-overrides.js   # Content replacements
+│       └── visibility-control.js  # Element hiding
 ```
 
-## Module Descriptions
+## How It Works
 
-### neuros-loader.js
-- Loads all modules in the correct order
-- Handles relative path resolution for different page locations
-- Should be included in HTML files instead of the original minified scripts
+1. **neuros-init.js** loads before Framer's scripts
+2. Core interceptors hook into Framer's functions
+3. Event manager coordinates modifications
+4. Modules apply changes at optimal times
+5. No more fighting with re-renders!
 
-### src/index.js
-- Main entry point for the application
-- Coordinates all module initialization
-- Waits for Framer to load before applying customizations
-- Provides cleanup functions for SPA navigation
+## Configuration
 
-### src/navigation/navigation-config.js
-- Contains navigation item definitions
-- Blog and Patients items are commented out but preserved
-- Schedule button configuration
+All customizations are in `src/config/site-config.js`:
 
-### src/navigation/navigation-renderer.js
-- Handles navigation DOM manipulation
-- Removes Blog and Patients links dynamically
-- Uses multiple strategies: CSS hiding, DOM removal, MutationObserver
-- Removes sections with classes framer-oqhszj and framer-1m9nwvx
-
-### src/components/blog-section-handler.js
-- Dedicated handler for removing blog-related content
-- Monitors DOM for dynamically added blog elements
-- Prevents blog section rendering if possible
-
-### src/components/patients-section-handler.js
-- Dedicated handler for removing patients-related content
-- Removes specific classes: framer-oqhszj, framer-1m9nwvx
-- Monitors DOM for dynamically added patients elements
-
-## File Size Guidelines
-
-All modules are kept under 2000 lines or 100KB to ensure AI agents can process them effectively. This modular approach allows for:
-- Easy maintenance and updates
-- AI-assisted code modifications
-- Better code organization
-- Reduced context window usage
-
-## Usage
-
-To use the new modular JavaScript structure in HTML files:
-
-```html
-<!-- Remove old script tags -->
-<!-- <script src="assets/js/chunk-*.mjs"></script> -->
-
-<!-- Add new loader -->
-<script src="assets/js/neuros-loader.js" defer></script>
+```javascript
+export const siteConfig = {
+  navigation: {
+    hiddenItems: ['blog', 'patients'],
+    items: [/* navigation structure */]
+  },
+  content: {
+    faq: {/* FAQ replacements */},
+    footer: {/* Footer modifications */}
+  },
+  visibility: {/* Elements to hide */},
+  social: {/* URL replacements */}
+};
 ```
 
-The loader will automatically adjust paths based on the current page location.
+## Adding Customizations
 
-## Customizations Applied
+1. Edit `site-config.js` with your changes
+2. Changes apply automatically on page load
+3. No code changes needed in modules
 
-1. **Navigation Updates**
-   - Blog and Patients links removed from all navigation menus
-   - Links are hidden via CSS and removed via JavaScript
+## Debug Mode
 
-2. **Section Removal**
-   - Sections with class `framer-oqhszj` are removed
-   - Sections with class `framer-1m9nwvx` are removed
+Add `?debug=true` to any URL to enable debug logging.
 
-3. **LinkedIn URL Updates**
-   - All LinkedIn links updated from `/emmafrank81` to `/company/neuros-platforms`
+## Module Guidelines
 
-## Development Notes
+For AI agents and developers:
 
-- The code waits for Framer's runtime to load before applying customizations
-- Multiple removal strategies ensure content is hidden even if one method fails
-- MutationObservers monitor for dynamically added content
-- CSS hiding provides immediate visual removal while JavaScript loads
+- Keep modules under 15KB (~400 lines)
+- Use the event system, not timers
+- Modify data, not DOM when possible
+- Check `processedElements` to avoid duplicates
+- Always log actions in debug mode
 
-## Future Maintenance
+## Performance
 
-When updating the site:
-1. Make changes in the modular source files
-2. Test locally using `python3 serve_local.py`
-3. Verify all customizations still work
-4. Update this documentation if new modules are added
+- CSS injected immediately for instant hiding
+- Interception happens before Framer loads
+- Event-driven updates (no polling)
+- Efficient element tracking with WeakSet
+
+## Browser Support
+
+Works in all modern browsers that support:
+- ES6 modules
+- Proxy objects
+- MutationObserver
+- Custom events
