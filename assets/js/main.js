@@ -396,7 +396,25 @@
         
         // Tilt effect for cards
         document.querySelectorAll('.card, .value-item, .step, .faq-item').forEach(card => {
+            let isHovering = false;
+            
+            card.addEventListener('mouseenter', function() {
+                isHovering = true;
+                // Store the current transition
+                this.dataset.originalTransition = this.style.transition;
+                // Only set transition for transform, preserving other transitions
+                const currentTransition = window.getComputedStyle(this).transition;
+                if (currentTransition && currentTransition !== 'none') {
+                    // Append transform transition to existing transitions
+                    this.style.transition = currentTransition + ', transform 0.1s ease-out';
+                } else {
+                    this.style.transition = 'transform 0.1s ease-out';
+                }
+            });
+            
             card.addEventListener('mousemove', function(e) {
+                if (!isHovering) return;
+                
                 const rect = this.getBoundingClientRect();
                 const x = (e.clientX - rect.left) / rect.width;
                 const y = (e.clientY - rect.top) / rect.height;
@@ -404,11 +422,26 @@
                 const tiltX = (y - 0.5) * 10;
                 const tiltY = (x - 0.5) * -10;
                 
-                this.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(10px)`;
+                // For hover-lift items, combine both transforms
+                if (this.classList.contains('hover-lift')) {
+                    this.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateY(-5px) translateZ(10px)`;
+                } else {
+                    this.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(10px)`;
+                }
             });
             
             card.addEventListener('mouseleave', function() {
+                isHovering = false;
                 this.style.transform = '';
+                // Restore original transition after a delay
+                setTimeout(() => {
+                    if (this.dataset.originalTransition) {
+                        this.style.transition = this.dataset.originalTransition;
+                        delete this.dataset.originalTransition;
+                    } else {
+                        this.style.transition = '';
+                    }
+                }, 100);
             });
         });
     }
