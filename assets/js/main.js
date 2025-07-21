@@ -122,11 +122,17 @@
         
         // Set active nav item
         const currentPath = window.location.pathname;
+        const pathParts = currentPath.split('/');
+        const currentPage = pathParts[pathParts.length - 1] || 'index';
+        
         navMenu.querySelectorAll('a').forEach(link => {
             const href = link.getAttribute('href');
-            if (href === currentPath || 
-                (currentPath === '/' && href === 'index.html') ||
-                (currentPath.includes(href.replace('.html', '')) && href !== '/')) {
+            // Remove ./ and / from href for comparison
+            const cleanHref = href.replace('./', '').replace('/', '');
+            
+            if ((currentPage === 'index' || currentPage === '') && (cleanHref === '' || cleanHref === 'index')) {
+                link.classList.add('active');
+            } else if (cleanHref && currentPage.includes(cleanHref)) {
                 link.classList.add('active');
             }
         });
