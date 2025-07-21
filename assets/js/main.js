@@ -201,22 +201,92 @@
                 submitBtn.disabled = true;
                 submitBtn.classList.add('loading');
                 
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                // If using Formspree, submit via AJAX
+                if (form.action && form.action.includes('formspree.io')) {
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            body: new FormData(form),
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            // Show success message
+                            showFormSuccess(form);
+                            
+                            // Reset form
+                            form.reset();
+                            
+                            // Clear validation states
+                            inputs.forEach(input => {
+                                input.parentElement.classList.remove('has-error', 'has-success');
+                            });
+                        } else {
+                            throw new Error('Form submission failed');
+                        }
+                    } catch (error) {
+                        console.error('Failed to submit form:', error);
+                        showFormError(form, 'Failed to send message. Please try again or email us directly at admin@neurosplatforms.com');
+                    } finally {
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('loading');
+                    }
+                    return;
+                }
                 
-                // Show success message
-                showFormSuccess(form);
-                
-                // Reset form
-                form.reset();
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-                submitBtn.classList.remove('loading');
-                
-                // Clear validation states
-                inputs.forEach(input => {
-                    input.parentElement.classList.remove('has-error', 'has-success');
-                });
+                // Otherwise use mailto fallback
+                try {
+                    // Get form data
+                    const formData = new FormData(form);
+                    const name = formData.get('name');
+                    const email = formData.get('email');
+                    const organization = formData.get('organization') || 'Not provided';
+                    const role = formData.get('role') || 'Not provided';
+                    const message = formData.get('message');
+                    
+                    // Create email body
+                    const emailBody = `
+New contact form submission from NeurOS website:
+
+Name: ${name}
+Email: ${email}
+Organization: ${organization}
+Role: ${role}
+
+Message:
+${message}
+                    `.trim();
+                    
+                    // Create mailto link
+                    const mailtoLink = `mailto:admin@neurosplatforms.com?subject=NeurOS Contact Form - ${name}&body=${encodeURIComponent(emailBody)}`;
+                    
+                    // Open email client
+                    window.location.href = mailtoLink;
+                    
+                    // Wait a bit then show success message
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Show success message
+                    showFormSuccess(form);
+                    
+                    // Reset form
+                    form.reset();
+                    
+                    // Clear validation states
+                    inputs.forEach(input => {
+                        input.parentElement.classList.remove('has-error', 'has-success');
+                    });
+                } catch (error) {
+                    console.error('Failed to open email client:', error);
+                    showFormError(form, 'Failed to open email client. Please email us directly at admin@neurosplatforms.com');
+                } finally {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('loading');
+                }
             });
         });
     }
@@ -273,13 +343,54 @@
     function showFormSuccess(form) {
         const success = document.createElement('div');
         success.className = 'form-success animate-fade-in';
-        success.textContent = 'Thank you! We\'ll be in touch soon.';
+        success.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span>Thank you! We'll be in touch soon.</span>
+            </div>
+        `;
+        success.style.cssText = `
+            background: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+            border: 1px solid #c3e6cb;
+            font-weight: 500;
+        `;
         form.appendChild(success);
         
         setTimeout(() => {
             success.style.opacity = '0';
+            success.style.transition = 'opacity 0.3s ease';
             setTimeout(() => success.remove(), 300);
         }, 5000);
+    }
+    
+    function showFormError(form, message) {
+        const error = document.createElement('div');
+        error.className = 'form-error animate-fade-in';
+        error.textContent = message;
+        error.style.cssText = `
+            background: #fee;
+            color: #e74c3c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        `;
+        form.appendChild(error);
+        
+        setTimeout(() => {
+            error.style.opacity = '0';
+            setTimeout(() => error.remove(), 300);
+        }, 7000);
     }
     
     // Progressive image loading
