@@ -2022,3 +2022,31 @@ img {
     border: none;
     border-radius: 16px;
 }
+
+/* Pricing tooltip */
+.price-note {
+    position: relative;
+    cursor: help;
+}
+
+.price-note::after {
+    content: "for a 1 year subscription";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    margin-bottom: 8px;
+}
+
+.price-note:hover::after {
+    opacity: 1;
+}
